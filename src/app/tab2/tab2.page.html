@@ -1,0 +1,28 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Añadir nueva nota
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <form [formGroup]="todo" (ngSubmit)="logForm()">
+    <ion-item>
+      <ion-button (click)="selectPhoto()"><ion-img #foto src=""></ion-img></ion-button>
+    </ion-item>
+    <ion-item>
+      <ion-label>Título</ion-label>
+      <ion-input type="text" formControlName="title"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Description</ion-label>
+      <ion-textarea formControlName="description"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label>Ubicación</ion-label>
+      <ion-label #locate></ion-label>
+    </ion-item>
+    <ion-button shape="round" color="primary" fill="outline" type="submit" [disabled]="!todo.valid">Submit</ion-button>
+  </form>
+</ion-content>
