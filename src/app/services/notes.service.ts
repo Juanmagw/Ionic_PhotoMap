@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
 import {
   AngularFirestore, AngularFirestoreCollection,
-  DocumentSnapshot,Query, QueryDocumentSnapshot
+  DocumentSnapshot, Query, QueryDocumentSnapshot
 } from '@angular/fire/compat/firestore'
+import { Camera, Photo } from '@capacitor/camera';
+import { readBlobAsBase64 } from '@capacitor/core/types/core-plugins';
 import { Note } from '../model/note';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotesService {
-  private lastDoc : QueryDocumentSnapshot<any>;
+  private lastDoc: QueryDocumentSnapshot<any>;
   private dbPath: string = 'notes';
   private dbRef: AngularFirestoreCollection<any>
   constructor(private db: AngularFirestore) {
@@ -20,57 +22,72 @@ export class NotesService {
    * @returns nota con el id creado
    */
   public async addNote(note: Note): Promise<Note> {
-      const { id, ...n } = note;
-      let newNote = await this.dbRef.add(n);
-      note.id = newNote.id
-      return note;
+    const { id, ...n } = note;
+    let newNote = await this.dbRef.add(n);
+    note.id = newNote.id
+    return note;
+  }
+  public async addPhoto(photo: Photo): Promise<Photo> {
+    let newFoto = await this.dbRef.add(photo);
+    return photo;
+  }
+  public imageName() {
+    const newTime = Math.floor(Date.now() / 1000);
+    return Math.floor(Math.random() * 20) + newTime;
+  }
+  public async storeImage(imageData: any) {
+    try {
+      const imageName = this.imageName();
+    } catch (error) {
+      console.log("No se ha podido guardar la imagen");
+    }
   }
   public removeNote(id): Promise<void> {
     return this.dbRef.doc(id).delete();
   }
- 
-  public async getNotesByContent(word):Promise<Note[]> {
-    if(!word) return;
-    let notes:Note[] = []
+
+  public async getNotesByContent(word): Promise<Note[]> {
+    if (!word) return;
+    let notes: Note[] = []
     let r;
 
-      this.lastDoc = null;
-      r = await this.dbRef.ref.orderBy('title').startAt(word).endAt(word+'\uf8ff').get();
+    this.lastDoc = null;
+    r = await this.dbRef.ref.orderBy('title').startAt(word).endAt(word + '\uf8ff').get();
 
-    r.docs.forEach(d=>{
+    r.docs.forEach(d => {
       this.lastDoc = d;
-      notes.push({id:d.id,...d.data()});
+      notes.push({ id: d.id, ...d.data() });
     })
     return notes;
   }
 
-  public async getNotes(refreshing?:boolean):Promise<Note[]> {
-    let notes:Note[] = []
+  public async getNotes(refreshing?: boolean): Promise<Note[]> {
+    let notes: Note[] = []
     let r;
-    if(refreshing || this.lastDoc == null){
+    if (refreshing || this.lastDoc == null) {
       this.lastDoc = null;
-      r = await this.dbRef.ref.orderBy('title','desc')
-              .limit(10).get();
-    }else{
-      r = await this.dbRef.ref.orderBy('title','desc')
-              .startAfter(this.lastDoc)
-              .limit(10).get();
+      r = await this.dbRef.ref.orderBy('title', 'desc')
+        .limit(10).get();
+    } else {
+      r = await this.dbRef.ref.orderBy('title', 'desc')
+        .startAfter(this.lastDoc)
+        .limit(10).get();
     }
-    r.docs.forEach(d=>{
+    r.docs.forEach(d => {
       this.lastDoc = d;
-      notes.push({id:d.id,...d.data()});
+      notes.push({ id: d.id, ...d.data() });
     })
     return notes;
   }
 
   public async getNote(id): Promise<Note> {
-        let n = await this.dbRef.doc(id).get().toPromise();
-        return {id:n.id,...n.data()};
+    let n = await this.dbRef.doc(id).get().toPromise();
+    return { id: n.id, ...n.data() };
   }
 
-  public async updateNote(note):Promise<void> {
-    if(!note.id) return;
-    const {id,...n} = note;
+  public async updateNote(note): Promise<void> {
+    if (!note.id) return;
+    const { id, ...n } = note;
     await this.dbRef.doc(note.id).set(n);
   }
 }

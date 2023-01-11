@@ -40,7 +40,7 @@ export class EditPage implements OnInit {
       if(!this.data){
         await this.noteS.addNote({
           title:this.todo.get('title').value,
-          description:this.todo.get('description').value
+          description:this.todo.get('description').value,
         });
         this.todo.reset("");
         this.uiS.showToast("¡Nota insertada correctamente!");
@@ -48,7 +48,7 @@ export class EditPage implements OnInit {
         await this.noteS.updateNote(
           {id:this.data.id,
            title:this.todo.get('title').value,
-           description:this.todo.get('description').value
+           description:this.todo.get('description').value,
           }
         );
         this.uiS.showToast("¡Nota actualizada correctamente!");
@@ -60,7 +60,7 @@ export class EditPage implements OnInit {
       this.uiS.hideLoading();
       this.modalCTRL.dismiss( {id:this.data.id,
         title:this.todo.get('title').value,
-        description:this.todo.get('description').value
+        description:this.todo.get('description').value,
        });
     }
   }

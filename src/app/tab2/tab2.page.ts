@@ -31,7 +31,8 @@ export class Tab2Page {
     try{
       await this.noteS.addNote({
         title:this.todo.get('title').value,
-        description:this.todo.get('description').value
+        description:this.todo.get('description').value,
+        photo:this.foto.src
       });
       this.todo.reset("");
       this.uiS.showToast("¡Nota insertada correctamente!");
@@ -47,11 +48,11 @@ export class Tab2Page {
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: true,
-      resultType: CameraResultType.Uri,
+      resultType: CameraResultType.Base64,
 
     });
 
-    let imageUrl = image.webPath;
+    let imageUrl = image.base64String;
 
     this.foto.src = imageUrl;
   }
